@@ -1,0 +1,723 @@
+<!Doctype html>
+<html>
+    <head>
+        <title>
+            Assignment Problem
+        </title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <link href="style.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+    <div id="main" style="background-color: white;padding-left: 50px;margin-top: 10px;padding-top: 20px;margin-bottom: 50px;padding-bottom: 20px">
+        <div>
+            <h1>Assignment Problem</h1><br/>            
+        </div>
+        <div>
+        	<label>Select your problem type : </label>
+        	<select id="problemType">
+        		<option value="min" selected="selected">Minimization</option>
+        		<option value="max">Maximization</option>
+        	</select><br/><br/>
+
+        	<label class="note">Note : To give restricted value just insert hyphen(-) in respective position.</label><br/><br/>
+
+            <label>Enter number of rows : </label>
+            <input type="number" id="rows"/><br/><br/>
+            
+            <label>Enter number of columns : </label>
+            <input type="number" id="cols"/><br/><br/>
+         
+            <input type="button" id="display_matrix" value="Get Matrix For Entering Data" /><br/><br/>
+        </div>
+        <div id="dataMatrix">
+            
+        </div><br/>
+
+        <div id="resultBtn" style="display: none;">
+        	<input type="button" id="getResult" value="Generate Result" />
+        </div>
+
+        <div id="result">
+        </div><br/><br/>
+
+        <div id="doAnother" style="display: none;text-align: center;">
+        	<input type="button" id="anotherQue" value="Solve Another Question" />
+        	<input type="button" id="printAns" value="Print Answer" />
+        </div>
+
+
+        <script>
+        	$(document).ready(function() {
+        		 $("#display_matrix").click(function(){
+
+	                rows=parseInt($("#rows").val());
+	                cols=parseInt($("#cols").val());
+	                
+	                if(rows<cols) {
+	                    matrixLength=rows;
+	                    dummy="row";
+	                } else {
+	                    matrixLength=cols;
+	                    dummy="col";
+	                }
+	                
+
+	                var k=0;
+	                var genTable;
+	                genTable="<table id='table1'>";
+	                $("#dataMatrix").html(genTable);
+	            	for (var i = 0; i < (rows+1); i++) {
+	            		genTable='<tr id=\"row'+i+'\"></tr>';
+	            		$("#dataMatrix").append(genTable);
+	            		for (var j = 0; j < (cols+1); j++) {
+	            			if(i==0 && j==0) {
+	            				genTable='<td>Row\\Column</td>';
+	            			}else if(i==0) {
+	            				genTable='<td>Column'+(j)+'</td>';
+	            			}else if(j==0) {
+	            				genTable='<td>Row'+(i)+'</td>';
+	            			}else {
+	            				genTable='<td id=\"col'+k+'\"><input class=\"inTable\" type=\"text\" id=\"data'+k+'\"></input></td>';
+	            				k++;
+	            			}
+	            			
+	            			$("#row"+i).append(genTable);
+	            		}
+	            		
+	            	}
+	            	genTable="</table>"
+	            	$("#dataMatrix").append(genTable);
+
+	            	$("#resultBtn").css("display","inline-block");          	
+	            	
+	            });
+
+        		$("#getResult").click(function() {
+        			cntModified=1;
+	            	block=(rows*cols)/matrixLength;
+
+	            	data=new Array(block);
+	            	for (var i = 0; i < block; i++) {
+						data[i] = new Array(block);
+					}
+
+					var k=0;
+	            	for (var i = 0; i < block; i++) {
+	            		for (var j = 0; j < block; j++) {
+	            			if(dummy=="col") {
+	            				if(j>(cols-1)) {
+	            					data[i][j]=0;
+	            				}else {
+	            					if($("#data"+k).val()=="-") {
+	            						data[i][j]=10000;
+	            					}else {
+	            						if(($("#data"+k).val())=="") {
+	            							data[i][j]=0;
+	            						}else {
+	            							data[i][j]=$("#data"+k).val();
+	            						}
+	            					}	            					
+	            					k++;
+	            				}
+	            			}else if(dummy=="row") {
+	            				if(($("#data"+k).val())==null) {
+	            					data[i][j]=0;
+	            				}else {
+	            					if($("#data"+k).val()=="-") {
+	            						data[i][j]=10000;
+	            					}else {
+	            						if(($("#data"+k).val())=="") {
+	            							data[i][j]=0;
+	            						}else {
+	            							data[i][j]=$("#data"+k).val();
+	            						}
+	            						
+	            					}	            					
+	            					k++;
+	            				}
+		            		}
+	            		}
+	            	}
+
+	            	originalData=new Array(block);
+	            	for (var i = 0; i < block; i++) {
+						originalData[i] = new Array(block);
+					}
+
+					for (var i = 0; i < block; i++) {
+	            		for (var j = 0; j < block; j++) {
+	            			originalData[i][j]=data[i][j];
+	            		}
+	            	}
+
+	            	$("#result").html("<br/><b>Given input is :</b> <br/><br/>");
+
+	            	var table='<table id="table2">';
+	            	
+	            	$("#result").append(table);
+	            	for (var i = 0; i < block; i++) {
+	            		table='<tr id=\"row2'+i+'\"></tr>';
+	            		$("#result").append(table);
+	            		for (var j = 0; j < block; j++) {
+	            			var printValue;
+	            			if(data[i][j]>1000) {
+	            				printValue="-";
+	            				table='<td>'+printValue+'</td>';
+	            			}else {
+	            				table='<td>'+data[i][j]+'</td>';
+	            			}	            			
+	            			$("#row2"+i).append(table);
+	            		}
+	            	}
+	            	table='</table>';
+	            	$("#result").append(table);
+
+	            	type=$("#problemType").val();
+	            	if(type=="max") {
+	            		var maxValue=0;
+	            		for (var i = 0; i < block; i++) {
+		            		for (var j = 0; j < block; j++) {
+		            			if(parseInt(data[i][j])>maxValue) {
+		            				maxValue=data[i][j];
+		            			}
+		            		}
+		            	}
+
+		            	for (var i = 0; i < block; i++) {
+		            		for (var j = 0; j < block; j++) {
+		            			data[i][j]=maxValue-data[i][j];
+		            		}
+		            	}
+
+		            	$("#result").append("<br/><b>Converted in Minimization problem :</b> <br/>The above maximization problem can be converted into the equivalent minimization problem by subtracting all the matrix elements from the highest element.<br/><br/>");
+
+		            	var table='<table id="tableCon">';
+		            	
+		            	$("#result").append(table);
+		            	for (var i = 0; i < block; i++) {
+		            		table='<tr id=\"rowCon'+i+'\"></tr>';
+		            		$("#result").append(table);
+		            		for (var j = 0; j < block; j++) {
+		            			var printValue;
+		            			if(data[i][j]>1000) {
+		            				printValue="-";
+		            				table='<td>'+printValue+'</td>';
+		            			}else {
+		            				table='<td>'+data[i][j]+'</td>';
+		            			}	       
+		            			$("#rowCon"+i).append(table);
+		            		}
+		            	}
+		            	table='</table>';
+		            	$("#result").append(table);
+		            	$("#result").append('<br/><br/>Now the above problem can be easily solved by Hungarian method.<br/><br/>')
+	            	}      	
+
+	            	var minRow=Array(block);
+	            	var minCol=Array(block);
+
+	            	minRow.fill(1000);
+	            	minCol.fill(1000);       	
+
+	            	for (var i = 0; i < block; i++) {
+	            		for (var j = 0; j < block; j++) {
+	            			var a=parseInt(minRow[i]);
+	            			var b=parseInt(data[i][j]);
+			            	if(a > b) {
+			            		minRow[i]=data[i][j];
+			            	}
+			            }
+			        }
+
+	            	for (var i = 0; i < block; i++) {
+	            		for (var j = 0; j < block; j++) {
+	            			data[i][j]=data[i][j]-minRow[i];
+	            		}
+	            	}
+
+	            	$("#result").append("<br/><br/><b>Step 1 :</b><br/>Identify the minimum element in each row and subtract it from every element of that row. The result is shown in the following table.<br/><br/>");
+
+	            	var table='<table id="table3">';
+	            	
+	            	$("#result").append(table);
+	            	for (var i = 0; i < block; i++) {
+	            		table='<tr id=\"row3'+i+'\"></tr>';
+	            		$("#result").append(table);
+	            		for (var j = 0; j < block; j++) {
+	            			var printValue;
+	            			if(data[i][j]>1000) {
+	            				printValue="-";
+	            				table='<td>'+printValue+'</td>';
+	            			}else {
+	            				table='<td>'+data[i][j]+'</td>';
+	            			}	       
+	            			$("#row3"+i).append(table);
+	            		}
+	            	}
+	            	table='</table>';
+	            	$("#result").append(table);
+
+	            	for (var i = 0; i < block; i++) {
+	            		for (var j = 0; j < block; j++) {
+			            	var a=parseInt(minCol[i]);
+	            			var b=parseInt(data[j][i]);
+			            	if(a > b) {
+			            		minCol[i]=data[j][i];
+			            	}
+			            }
+			        }
+
+
+	            	for (var i = 0; i < block; i++) {
+	            		for (var j = 0; j < block; j++) {
+	            			data[j][i]=data[j][i]-minCol[i];
+	            		}
+	            	}
+
+	            	$("#result").append("<br/><br/><b>Step 2 :</b><br/>Identify the minimum element in each column and subtract it from every element of that column. The result is shown in the following table.<br/><br/>");
+
+	            	var table='<table id="table4">';
+	            	
+	            	$("#result").append(table);
+	            	for (var i = 0; i < block; i++) {
+	            		table='<tr id=\"row4'+i+'\"></tr>';
+	            		$("#result").append(table);
+	            		for (var j = 0; j < block; j++) {
+	            			var printValue;
+	            			if(data[i][j]>1000) {
+	            				printValue="-";
+	            				table='<td>'+printValue+'</td>';
+	            			}else {
+	            				table='<td>'+data[i][j]+'</td>';
+	            			}	       
+	            			$("#row4"+i).append(table);
+	            		}
+	            	}
+	            	table='</table>';
+	            	$("#result").append(table);
+
+	            	$("#result").append('<br/><br/><b>Step 3 :</b><br/>Make the assignments for the reduced matrix obtained from steps 1 and 2 in the following way:<br/><br/>a. For each row or column with a single zero value cell that has not be assigned or eliminated, box   that zero value as an assigned cell.<br/><br/>b. For every zero that becomes assigned, cross out (X) all other zeros in the same row and the same column.<br/><br/>c. If for a row and a column, there are two or more zeros and one cannot be chosen by inspection, choose the cell arbitrarily for assignment.<br/><br/>d. The above process may be continued until every zero cell is either assigned or crossed (X).<br/><br/>');
+
+	            	$("result").append('<br/><br/><b>Step 4 :</b><br/>An optimal assignment is found, if the number of assigned cells equals the number of rows (and columns). In case you have chosen a zero cell arbitrarily, there may be alternate optimal solutions. If no optimal solution is found, goto step 5.<br/><br/>');
+
+	            	$("#result").append('<br/><br/><b>Step 5 :</b><br/>Draw the minimum number of vertical and horizontal lines necessary to cover all the zeros in the reduced matrix obtained from step 3.<br/><br/>')
+
+	            	$("#result").append('<br/><br/><b>Step 6 :</b><br/>Select the smallest element from all the uncovered elements. Subtract this smallest element from all the uncovered elements and add it to the elements, which lie at the intersection of two lines. Thus, we obtain another reduced matrix for fresh assignment.<br/><br/>');
+
+	            	$("#result").append('<br/><br/><b>Step 7 :</b><br/>Repeat Step 3 to Step 6 this process until total assignments(N)=number of rows/columns.<br/><br/>');
+
+	            	assignmentTable=new Array(block);
+	            	for (var i = 0; i < block; i++) {
+						assignmentTable[i] = new Array(block);
+					}
+					
+					function calAssignmentTable() {
+						for (var i = 0; i < block; i++) {
+		            		for (var j = 0; j < block; j++) {
+		            			assignmentTable[i][j]=0;
+		            		}
+		            	}
+
+		            	restrictPosition=new Array(block);
+		            	for (var i = 0; i < block; i++) {
+							restrictPosition[i] = new Array(block);
+						}
+
+		            	for (var i = 0; i < block; i++) {
+		            		for (var j = 0; j < block; j++) {
+		            			restrictPosition[i][j]=0;
+		            		}
+		            	}
+
+		            	for (var i = 0; i < block; i++) {
+		            		for (var j = 0; j < block; j++) {
+		            			if(parseInt(data[i][j])>1000) {
+		            				restrictPosition[i][j]=1;
+		            			}
+		            		}
+		            	}
+
+						cntZero=new Array(block);
+						cntZeroCol=new Array(block);
+						cntZero.fill(0);
+						cntZeroCol.fill(0);
+
+						for (var i = 0; i < block; i++) {
+		            		for (var j = 0; j < block; j++) {
+		            			if(parseInt(data[i][j])==0) {
+		            				cntZero[i]++;
+		            			}
+		            		}
+		            	}
+
+		            	for (var i = 0; i < block; i++) {
+		            		for (var j = 0; j < block; j++) {
+		            			if(parseInt(data[j][i])==0) {
+		            				cntZeroCol[i]++;
+		            			}
+		            		}
+		            	}
+
+		            	var rowF=new Array(block);
+		            	var colF=new Array(block);
+		            	rowF.fill(0);
+		            	colF.fill(0);
+
+		            	for(var i = 0; i < block; i++) {
+							for(var j = 0; j < block; j++) {
+								if(parseInt(data[i][j])==0) {
+									if(parseInt(rowF[i])==0 && parseInt(colF[j])==0) {
+										//alert(cntZero[i]);
+										if(parseInt(cntZero[i])==1) {
+											assignmentTable[i][j]=1;
+											rowF[i]=-1;
+											colF[j]=-1;
+											cntZero[i]=0;
+											cntZeroCol[j]=0;
+											for (var k = i; k < block; k++) {
+												if(parseInt(data[k][j])==0) {
+													if(parseInt(cntZero[k])!=0) {
+														cntZero[k]--;
+													}													
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+
+						for(var i = 0; i < block; i++) {
+							for(var j = 0; j < block; j++) {
+								if(parseInt(data[i][j])==0) {
+									if(parseInt(rowF[i])==0 && parseInt(colF[j])==0) {
+										if(parseInt(cntZero[i])==2) {
+											if(parseInt(cntZeroCol[j])==1) {
+												assignmentTable[i][j]=1;
+												rowF[i]=-1;
+												colF[j]=-1;
+												cntZero[i]=0;
+												cntZeroCol[j]=0;
+												for (var k = 0; k < block; k++) {
+													if(parseInt(data[k][j]==0)) {
+														if(parseInt(cntZero[k])!=0) {
+															cntZero[k]--;
+														}													
+													}
+												}
+											}	
+										}
+									}
+								}
+							}
+						}
+
+						for(var i = 0; i < block; i++) {
+							for(var j = 0; j < block; j++) {
+								if(parseInt(data[i][j])==0) {
+									if(parseInt(rowF[i])==0 && parseInt(colF[j])==0) {
+										if(parseInt(cntZero[i])==2) {
+											if(parseInt(cntZeroCol[j])==2) {
+												assignmentTable[i][j]=1;
+												rowF[i]=-1;
+												colF[j]=-1;
+												cntZero[i]=0;
+												cntZeroCol[j]=0;
+												for (var k = 0; k < block; k++) {
+													if(parseInt(data[k][j]==0)) {
+														if(parseInt(cntZero[k])!=0) {
+															cntZero[k]--;
+														}													
+													}
+												}
+											}	
+										}
+									}
+								}
+							}
+						}
+
+						for(var i = 0; i < block; i++) {
+							for(var j = 0; j < block; j++) {
+								if(parseInt(data[i][j])==0) {
+									if(parseInt(rowF[i])==0 && parseInt(colF[j])==0) {
+										if(parseInt(cntZero[i])==2) {
+											if(parseInt(cntZeroCol[j])>=2) {
+												assignmentTable[i][j]=1;
+												rowF[i]=-1;
+												colF[j]=-1;
+												cntZero[i]=0;
+												cntZeroCol[j]=0;
+												for (var k = 0; k < block; k++) {
+													if(parseInt(data[k][j]==0)) {
+														if(parseInt(cntZero[k])!=0) {
+															cntZero[k]--;
+														}													
+													}
+												}
+											}	
+										}
+									}
+								}
+							}
+						}
+
+						for(var i = 0; i < block; i++) {
+							for(var j = 0; j < block; j++) {
+								if(parseInt(data[i][j])==0) {
+									if(parseInt(rowF[i])==0 && parseInt(colF[j])==0) {
+										if(parseInt(cntZero[i])>=2) {
+											if(parseInt(cntZeroCol[j])==1) {
+												assignmentTable[i][j]=1;
+												rowF[i]=-1;
+												colF[j]=-1;
+												cntZero[i]=0;
+												cntZeroCol[j]=0;
+												for (var k = 0; k < block; k++) {
+													if(parseInt(data[k][j]==0)) {
+														if(parseInt(cntZero[k])!=0) {
+															cntZero[k]--;
+														}													
+													}
+												}
+											}											
+										}
+									}
+								}
+							}
+						}
+
+						for(var i = 0; i < block; i++) {
+							for(var j = 0; j < block; j++) {
+								if(parseInt(data[i][j])==0) {
+									if(parseInt(rowF[i])==0 && parseInt(colF[j])==0) {
+										if(parseInt(cntZero[i])>=2) {
+											if(parseInt(cntZeroCol[j])==2) {
+												assignmentTable[i][j]=1;
+												rowF[i]=-1;
+												colF[j]=-1;
+												cntZero[i]=0;
+												cntZeroCol[j]=0;
+												for (var k = 0; k < block; k++) {
+													if(parseInt(data[k][j]==0)) {
+														if(parseInt(cntZero[k])!=0) {
+															cntZero[k]--;
+														}													
+													}
+												}
+											}											
+										}
+									}
+								}
+							}
+						}
+
+
+						for(var i = 0; i < block; i++) {
+							for(var j = 0; j < block; j++) {
+								if(parseInt(data[i][j])==0) {
+									if(parseInt(rowF[i])==0 && parseInt(colF[j])==0) {
+										if(parseInt(cntZero[i])>=2) {
+											if(parseInt(cntZeroCol[j])>=2) {
+												assignmentTable[i][j]=1;
+												rowF[i]=-1;
+												colF[j]=-1;
+												cntZero[i]=0;
+												cntZeroCol[j]=0;
+												for (var k = 0; k < block; k++) {
+													if(parseInt(data[k][j]==0)) {
+														if(parseInt(cntZero[k])!=0) {
+															cntZero[k]--;
+														}													
+													}
+												}
+											}											
+										}
+									}
+								}
+							}
+						}
+
+
+						cntAlloc=0;
+						for (var i = 0; i < block; i++) {
+							for (var j = 0; j < block; j++) {
+								if(parseInt(assignmentTable[i][j])==1) {
+									cntAlloc++;
+								}
+							}
+						}
+					}
+
+					calAssignmentTable();					
+
+	            	while(true) {
+	            		if(cntAlloc==block) {
+							$("#result").append("<br/><br/><b>Assignment Matrix (Optimum) :</b><br/><br/>");
+
+			            	var table='<table id="asiignmentTable">';
+			            	
+			            	$("#result").append(table);
+			            	for (var i = 0; i < block; i++) {
+			            		table='<tr id=\"rowA'+i+'\"></tr>';
+			            		$("#result").append(table);
+			            		for (var j = 0; j < block; j++) {
+			            			if(parseInt(restrictPosition[i][j])==1) {
+			            				table='<td>-</td>';
+			            			}else {
+			            				table='<td>'+assignmentTable[i][j]+'</td>';
+			            			}			            			
+			            			$("#rowA"+i).append(table);
+			            		}
+		            		}
+		            		table='</table>';
+		            		$("#result").append(table);
+
+		            		var ans=0;
+
+		            		for (var i = 0; i < block; i++) {
+								for (var j = 0; j < block; j++) {
+									if(parseInt(assignmentTable[i][j])==1) {
+										ans=ans+parseInt(originalData[i][j]);
+									}
+								}
+							}
+
+							if(type=="max") {
+								$("#result").append("<br/><br/><label class='result' style='font-weight: bolder;'>Profit (Maximum) : </label>"+ans);
+							}else {
+								$("#result").append("<br/><br/><label class='result' style='font-weight: bolder;'>Cost (Minimum) : </label>"+ans);
+							}	
+
+							$("#doAnother").css("display","inline-block"); 						
+
+							cntModified=1;
+							break;
+						}else {
+
+							var markedRows=new Array(block);
+							var markedCols=new Array(block);
+
+							markedRows.fill(-1);
+							markedCols.fill(-1);
+
+							outer :
+							for (var i = 0; i < block; i++) {
+								for (var j = 0; j < block; j++) {
+									if(parseInt(assignmentTable[i][j])==1) {
+										markedRows[i]=-1;
+										continue outer;
+									}else {
+										markedRows[i]=i;
+									}
+								}
+							}
+							
+							for (var i = 0; i < block; i++) {
+								for (var j = 0; j < block; j++) {
+									var x = parseInt(markedRows[i]);
+									if(x==-1) {
+									}else {
+										if(parseInt(data[x][j])==0) {
+											markedCols[j]=j;
+										}
+									}
+								}
+							}							
+
+							for (var i = 0; i < block; i++) {
+								for (var j = 0; j < block; j++) {
+									var x = parseInt(markedCols[i]);
+									if(x==-1) {
+									}else {
+										if(parseInt(assignmentTable[j][x])==1) {
+											markedRows[j]=j;
+										}
+									}
+								}
+							}		
+
+							var coveredRows=new Array(block);
+							var coveredCols=new Array(block);
+
+							coveredRows.fill(0);
+							coveredCols.fill(0);
+
+							for (var i = 0; i < block; i++) {
+								if(parseInt(markedRows[i])==-1) {
+									coveredRows[i]=1;
+								}
+								if(parseInt(markedCols[i])!=-1) {
+									coveredCols[i]=1;
+								}
+							}
+
+							var cntTable=1;
+							var smallUncover=1000;
+
+							outer2 :
+							for (var i = 0; i < block; i++) {
+								for (var j = 0; j < block; j++) {
+									if(parseInt(coveredRows[i])!=1 && parseInt(coveredCols[j])!=1) {
+										if(smallUncover>data[i][j]) {
+											smallUncover=data[i][j];
+										}
+									}
+								}
+							}
+
+							for (var i = 0; i < block; i++) {
+								for (var j = 0; j < block; j++) {
+									if(parseInt(coveredRows[i])==1 && parseInt(coveredCols[j])==1) {
+										//alert("in 1");
+										data[i][j]=data[i][j]+smallUncover;
+									}else if(parseInt(coveredRows[i])==0 && parseInt(coveredCols[j])==0) {
+										//alert("in 2");
+										data[i][j]=data[i][j]-smallUncover;
+									}
+								}
+							}
+
+		            		calAssignmentTable();
+							
+		            		var id;
+		            		id='rowM'+cntModified;
+							$("#result").append('<br/><br/><b>Modified Matrix '+cntModified+':</b><br/><br/>');
+
+			            	var table='<table id=\"modifiedTable'+cntModified+'\">';
+			            	
+			            	$("#result").append(table);
+			            	for (var i = 0; i < block; i++) {
+			            		table='<tr id=\"'+id+i+'\"></tr>';
+			            		$("#result").append(table);
+			            		for (var j = 0; j < block; j++) {
+			            			var printValue;
+			            			if(data[i][j]>1000) {
+			            				printValue="-";
+			            				table='<td>'+printValue+'</td>';
+			            			}else {
+			            				table='<td>'+data[i][j]+'</td>';
+			            			}	       
+			            			$("#"+id+i).append(table);
+			            		}
+		            		}
+		            		table='</table>';
+		            		$("#result").append(table);
+
+		            		cntModified++;		            		
+						}
+	            	}
+        		}) ;
+
+				$("#anotherQue").click(function() {
+					location.reload();
+				});
+
+				$("#printAns").click(function() {
+					window.print();
+				});
+        	});           
+        </script>   
+        </div> 
+    </body>
+</html>
