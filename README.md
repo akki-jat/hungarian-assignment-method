@@ -7,7 +7,7 @@ This repository tries to **implement** Hungarian Assignment Method with **JavaSc
 # How to run
 
 1. Clone or Download this repository on your local machine.
-2. Open Hungarian_Assignment_Method.html in you browser.
+2. Open index.html in you browser.
 
 # Why?
 
