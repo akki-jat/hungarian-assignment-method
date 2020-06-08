@@ -9,6 +9,6 @@ This repository tries to **implement** Hungarian Assignment Method with **JavaSc
 1. Clone or Download this repository on your local machine.
 2. Open index.html in you browser.
 
-# Why?
+# Why
 
 This project was only created for college academics.
